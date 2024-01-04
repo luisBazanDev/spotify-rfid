@@ -1,0 +1,38 @@
+{
+  "name": "spotify-rfid",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "A project to control music with RFID tags (13.56 MHz) using ESP32 as client and nodejs as backend.",
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "nodemon src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luisBazanDev/spotify-rfid.git"
+  },
+  "keywords": [
+    "esp32",
+    "arduino",
+    "spotify",
+    "rfid",
+    "rfid",
+    "tags"
+  ],
+  "author": "Luis Bazan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/luisBazanDev/spotify-rfid/issues"
+  },
+  "homepage": "https://github.com/luisBazanDev/spotify-rfid#readme",
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3",
+    "spotify-web-api-node": "^5.0.2"
+  }
+}
