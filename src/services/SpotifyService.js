@@ -1,4 +1,6 @@
 import SpotifyWebApi from "spotify-web-api-node";
+import request from "request";
+import { updateEnvValue } from "../utils/envUtils.js";
 import {
   CLIENT_ID,
   CLIENT_SECRET,
@@ -38,7 +40,7 @@ class SpotifyService {
           (err && err.body.error.message === "The access token expired") ||
           !res.body
         ) {
-          resolve(refreshToken());
+          resolve(this.refreshToken());
         } else {
           if (logger) {
             console.log("token validated");
@@ -55,19 +57,40 @@ class SpotifyService {
    * @returns True if it was possible refresh the token.
    */
   async refreshToken() {
+    return new Promise(async (resolve) => {
+      const data = await this.spotifyApi.refreshAccessToken();
+      if (!data.body.access_token) return resolve(false);
+      updateEnvValue("USER_TOKEN", data.body.access_token);
+      this.spotifyApi.setAccessToken(data.body.access_token);
+      console.log("Token refresh");
+      resolve(true);
+    });
+  }
+
+  async getTokenFromCode(code) {
     return new Promise((resolve) => {
-      this.spotifyApi
-        .refreshAccessToken()
-        .then((x) => {
-          if (!x.body.access_token) return resolve(false);
-          this.spotifyApi.setAccessToken(x.body.access_token);
-          console.log("Token refresh");
-          resolve(true);
-        })
-        .catch((err) => {
-          console.error(err);
-          resolve(false);
-        });
+      const requestAuthOptions = {
+        url: "https://accounts.spotify.com/api/token",
+        headers: {
+          Authorization:
+            "Basic " +
+            new Buffer.from(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64"),
+        },
+        form: {
+          grant_type: "authorization_code",
+          code: code,
+          redirect_uri: REDIRECT_URI,
+        },
+        json: true,
+      };
+
+      request.post(requestAuthOptions, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+          resolve(body);
+          return;
+        }
+        resolve(null);
+      });
     });
   }
 }

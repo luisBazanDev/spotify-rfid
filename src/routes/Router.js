@@ -1,4 +1,5 @@
 import { Router } from "express";
+import SpotifyService from "../services/SpotifyService.js";
 import { SECRET_WORD } from "../config.js";
 import Relation from "../models/relations.js";
 
@@ -25,6 +26,17 @@ router.get("/admin", async (req, res) => {
   if (req.query.secret_word === SECRET_WORD) {
     res.render("admin");
   } else res.status(401).send("Unauthorized");
+});
+
+// Callback to Oauth 2.0
+// https://developer.spotify.com/documentation/web-api/tutorials/code-flow
+router.get("/callback", async (req, res) => {
+  if (req.query.code) {
+    const tokens = await SpotifyService.getTokenFromCode(req.query.code);
+    res.json(tokens);
+  } else {
+    res.status(200).send("OK");
+  }
 });
 
 export default router;
