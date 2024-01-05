@@ -2,6 +2,7 @@ import { Router } from "express";
 import SpotifyService from "../services/SpotifyService.js";
 import { SECRET_WORD } from "../config.js";
 import Relation from "../models/relations.js";
+import spotifyService from "../services/SpotifyService.js";
 
 const router = Router();
 
@@ -23,8 +24,9 @@ router.post("/read", async (req, res) => {
 
 // Admin view
 router.get("/admin", async (req, res) => {
+  if (SpotifyService.profile == null) await spotifyService.validToken();
   if (req.query.secret_word === SECRET_WORD) {
-    res.render("admin");
+    res.render("admin", { spotifyAcount: SpotifyService.profile });
   } else res.status(401).send("Unauthorized");
 });
 

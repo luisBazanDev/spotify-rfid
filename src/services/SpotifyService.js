@@ -18,6 +18,7 @@ class SpotifyService {
       refreshToken: USER_REFRESH_TOKEN,
       redirectUri: REDIRECT_URI,
     });
+    this.profile = null;
 
     // Singleton pattern
     if (typeof SpotifyService.instance === "object") {
@@ -38,6 +39,7 @@ class SpotifyService {
       this.spotifyApi.getUser("peladillas25", (err, res) => {
         if (
           (err && err.body.error.message === "The access token expired") ||
+          !res ||
           !res.body
         ) {
           resolve(this.refreshToken());
@@ -46,6 +48,7 @@ class SpotifyService {
             console.log("token validated");
             console.log(`${res.body.display_name}(${res.body.id})`);
           }
+          this.profile = res.body;
           resolve(true);
         }
       });

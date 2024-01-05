@@ -3,11 +3,69 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin</title>
+    <title>Admin panel</title>
+    <script
+      src="https://kit.fontawesome.com/5189537aec.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body>
-    <h1>Hello world - Admin panel</h1>
-    <div>clasa</div>
+    <div class="flex flex-col bg-gradient-to-b from-violet-500 to-purple-950">
+      <div class="flex w-full justify-center">
+        <h1 class="text-white font-bold">Spotify RFID - Admin panel</h1>
+      </div>
+      <% if(spotifyAcount != null) { %>
+      <a
+        class="w-full grid grid-cols-2 p-2 transition-all hover:scale-[1.1]"
+        href="<%= spotifyAcount.external_urls.spotify %>"
+      >
+        <div class="flex justify-center">
+          <img
+            class="w-1/2 aspect-square object-cover col-span-1 rounded-full"
+            src="<%= spotifyAcount.images[1].url %>"
+            alt=""
+          />
+        </div>
+        <div class="flex flex-col justify-center">
+          <span class="text-lg text-white">
+            <%= spotifyAcount.display_name %>
+          </span>
+          <span class="text-sm text-slate-500">@<%= spotifyAcount.id %></span>
+        </div>
+      </a>
+      <% } else { %>
+      <div class="w-full">No acount</div>
+      <% } %>
+    </div>
+    <div class="flex flex-col bg-purple-950 min-h-screen h-full">
+      <% for(let tag_id of
+      ["tag-1213-123-123-123","tag-1213-123-123-123","tag-1213-123-123-123"]) {
+      %>
+      <div class="flex flex-col items-center my-3 text-slate-200">
+        <span><%= tag_id %></span>
+        <span>album</span>
+        <div class="w-3/4 flex justify-between gap-8 text-black">
+          <!-- actions -->
+          <button
+            class="w-full aspect-[4/3] flex justify-center items-center rounded-lg bg-yellow-500"
+          >
+            <i class="fa-solid fa-link-slash"></i>
+          </button>
+          <button
+            class="w-full aspect-[4/3] flex justify-center items-center rounded-lg bg-red-500"
+          >
+            <i class="fa-regular fa-trash-can"></i>
+          </button>
+          <button
+            class="w-full aspect-[4/3] flex justify-center items-center rounded-lg bg-blue-500"
+          >
+            <i class="fa-regular fa-pen-to-square"></i>
+          </button>
+        </div>
+      </div>
+      <% } %>
+    </div>
     <script>
       setTimeout(() => {
         window.location.reload();
