@@ -96,6 +96,102 @@ class SpotifyService {
       });
     });
   }
+
+  /**
+   *
+   * @param {string} type
+   * @param {string} id
+   * @returns {boolean}
+   */
+  async readRelation(type, id) {
+    return new Promise(async (resolve) => {
+      var baseUri = "spotify:";
+      switch (type) {
+        case "ALBUM":
+          resolve(await this.play(baseUri + `album:${id}`));
+          break;
+        case "ARTIST":
+          resolve(
+            await this.play(null, {
+              context_uri: baseUri + `artist:${id}`,
+              offset: null,
+            })
+          );
+          break;
+        case "PLAYLIST":
+          resolve(await this.play(baseUri + `playlist:${id}`));
+          break;
+        case "PODCAST":
+          resolve(await this.play(baseUri + `show:${id}`));
+          break;
+        case "TRACK":
+          const trackInformation = await this.getTrackInformation(id);
+          if (trackInformation === null) return resolve(false);
+          resolve(
+            await this.play(null, {
+              context_uri: trackInformation.album.uri,
+              offset: { position: trackInformation.track_number - 1 },
+            })
+          );
+          break;
+
+        default:
+          resolve(false);
+          break;
+      }
+    });
+  }
+
+  /**
+   * Play album in spotify
+   * @param {string} spotifyUri Spotify Uri
+   * @param {object} options Play options
+   * @returns {boolean} True if playback started
+   */
+  async play(
+    spotifyUri,
+    options = {
+      context_uri: spotifyUri,
+      position_ms: 0,
+      offset: { position: 0 },
+    }
+  ) {
+    return new Promise((resolve) => {
+      this.spotifyApi
+        .play(options)
+        .then((res) => {
+          if (res.statusCode === 204) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        })
+        .catch((err) => {
+          console.log(options);
+          console.error(err);
+          resolve(false);
+        });
+    });
+  }
+
+  /**
+   * Resolve track information or null
+   * @param {string} id Track id
+   * @returns {(SpotifyApi.SingleTrackResponse | null)}
+   */
+  async getTrackInformation(id) {
+    return new Promise((resolve) => {
+      this.spotifyApi
+        .getTrack(id)
+        .then((res) => {
+          resolve(res?.body);
+        })
+        .catch((err) => {
+          console.error(err);
+          resolve(null);
+        });
+    });
+  }
 }
 
 const spotifyService = new SpotifyService();

@@ -9,7 +9,6 @@ const router = Router();
 // App routes
 // Main route for the esp32
 router.post("/read", async (req, res) => {
-  console.log(req.body);
   // Valid request
   if (req.body.secret_word !== SECRET_WORD)
     return res.status(400).send("Error");
@@ -24,7 +23,7 @@ router.post("/read", async (req, res) => {
     relation = new Relation({ rfid: tag_id });
     await relation.save();
   }
-  console.log(tag_id, relation);
+  const result = await spotifyService.readRelation(relation.type, relation.id);
   res.status(200).send("Success");
 });
 
