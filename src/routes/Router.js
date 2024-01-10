@@ -9,16 +9,22 @@ const router = Router();
 // App routes
 // Main route for the esp32
 router.post("/read", async (req, res) => {
-  console.log(req.query);
+  console.log(req.body);
   // Valid request
-  if (req.query.secret_word !== SECRET_WORD)
+  if (req.body.secret_word !== SECRET_WORD)
     return res.status(400).send("Error");
-  if (!req.query.rfid) return res.status(400).send("Error");
+  if (!req.body.rfid) return res.status(400).send("Error");
   // Valid token
-  if (!(await validToken())) return res.status(500).send("Error");
+  if (!(await spotifyService.validToken()))
+    return res.status(500).send("Error");
   // Place album
-  const tag_id = req.query.rfid;
-  console.log(tag_id, await Relation.findOne({ rfid: tag_id }));
+  const tag_id = req.body.rfid;
+  let relation = await Relation.findOne({ rfid: tag_id });
+  if (relation === null) {
+    relation = new Relation({ rfid: tag_id });
+    await relation.save();
+  }
+  console.log(tag_id, relation);
   res.status(200).send("Success");
 });
 
@@ -26,7 +32,8 @@ router.post("/read", async (req, res) => {
 router.get("/admin", async (req, res) => {
   if (SpotifyService.profile == null) await spotifyService.validToken();
   if (req.query.secret_word === SECRET_WORD) {
-    res.render("admin", { spotifyAcount: SpotifyService.profile });
+    const items = await Relation.find();
+    res.render("admin", { spotifyAcount: SpotifyService.profile, items });
   } else res.status(401).send("Unauthorized");
 });
 

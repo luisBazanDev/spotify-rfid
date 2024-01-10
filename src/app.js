@@ -7,6 +7,7 @@ import { connect as connectMongo } from "mongoose";
 // Http server
 const app = express();
 
+app.use(express.urlencoded({ extended: false }));
 app.set("view engine", "ejs");
 app.use("/", Router);
 
