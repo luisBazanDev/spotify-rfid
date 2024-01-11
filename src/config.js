@@ -9,3 +9,4 @@ export const REDIRECT_URI = process.env.REDIRECT_URI;
 export const PORT = process.env.PORT || 3000;
 export const MONGO_URI = process.env.MONGO_URI;
 export const SECRET_WORD = process.env.SECRET_WORD;
+export const RELATION_TYPES = ["ALBUM", "ARTIST", "SONG", "POTCAST", "IDK"];

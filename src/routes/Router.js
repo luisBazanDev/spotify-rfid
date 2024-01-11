@@ -1,6 +1,6 @@
 import { Router } from "express";
 import SpotifyService from "../services/SpotifyService.js";
-import { SECRET_WORD } from "../config.js";
+import { SECRET_WORD, RELATION_TYPES } from "../config.js";
 import Relation from "../models/relations.js";
 import spotifyService from "../services/SpotifyService.js";
 
@@ -34,6 +34,44 @@ router.get("/admin", async (req, res) => {
     const items = await Relation.find();
     res.render("admin", { spotifyAcount: SpotifyService.profile, items });
   } else res.status(401).send("Unauthorized");
+});
+
+// Api
+router.put("/unlink", async (req, res) => {
+  if (!req.body.secret_word || !req.body.tag_id) return res.status(400);
+  if (req.body.secret_word !== SECRET_WORD)
+    return res.status(401).send("Unauthorized");
+  const data = await Relation.findOne({ rfid: req.body.tag_id });
+  if (data === null) return res.status(404);
+  data.type = "IDK";
+  data.id = null;
+  await data.save();
+  res.status(200).send("Unlinked");
+});
+
+router.put("/delete", async (req, res) => {
+  if (!req.body.secret_word || !req.body.tag_id) return res.status(400);
+  if (req.body.secret_word !== SECRET_WORD)
+    return res.status(401).send("Unauthorized");
+  const data = await Relation.findOne({ rfid: req.body.tag_id });
+  if (data === null) return res.status(404);
+  await Relation.deleteOne({ _id: data._id });
+  res.status(200).send("Deleted");
+});
+
+router.post("/edit", async (req, res) => {
+  if (
+    !req.body.secret_word ||
+    !req.body.tag_id ||
+    !req.body.type ||
+    !req.body.spotify_id
+  )
+    return res.status(400);
+  if (req.body.secret_word !== SECRET_WORD)
+    return res.status(401).send("Unauthorized");
+  if (!RELATION_TYPES.includes(req.body.type)) return res.status(400);
+  const data = await Relation.findOne({ rfid: req.body.tag_id });
+  if (data === null) return res.status(404);
 });
 
 // Callback to Oauth 2.0
